@@ -46,6 +46,22 @@ var id=req.params.id;
   })
 });
 
+app.delete('/todos/:id', (req,res) => {
+var id=req.params.id;
+if(!ObjectID.isValid(id)) {
+  return res.status(404).send();
+}
+
+Todo.findByIdAndRemove(id).then((doc) => {
+  if(!doc) {
+    return res.send(404).send();
+  }
+  res.send({doc});
+  }, (err) => {
+  res.status(400).send();
+  });
+});
+
 app.listen(port, () => {
   console.log(`Server up on ${port}`);
 });
