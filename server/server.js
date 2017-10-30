@@ -94,7 +94,8 @@ if (req.body.completed) {
   }
 }
 
-if(req.body.completed && req.body.completed == 'true') {
+if(req.body.completed && req.body.completed == true) {
+  //need to add check for already true update
   update.completed = req.body.completed;
   update.completedAt = new Date().getTime();
 
