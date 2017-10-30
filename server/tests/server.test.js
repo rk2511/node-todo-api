@@ -8,7 +8,9 @@ var todos = [{
   text: 'This is dummy 1'
 }, {
   _id: new ObjectID(),
-  text: 'This is dummy 2'
+  text: 'This is dummy 2',
+  completed:true,
+  completedAt:1111
 }];
 
 beforeEach ((done) => {
@@ -149,5 +151,9 @@ it('Should return 404 when invalid', (done) => {
   .delete('/todos/abcd123')
   .expect(404)
   .end(done);
+  });
 });
+
+describe('Patch update a todo' , () => {
+  it('')
 });

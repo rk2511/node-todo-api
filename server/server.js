@@ -84,7 +84,9 @@ console.log(req.body);
 // body.completedAt = null;
 // }
 
-if(!(req.body.completed || req.body.text)) {
+if(typeof(req.body.completed) == 'undefined' && typeof(req.body.text) == 'undefined') {
+  console.log(req.body.completed);
+  console.log(req.body.text);
   return res.status(400).send('Please send a data');
 }
 
@@ -96,6 +98,18 @@ if (req.body.completed) {
 
 if(req.body.completed && req.body.completed == true) {
   //need to add check for already true update
+  Todo.findById(id).then((doc) => {
+    if(!doc) {
+      return res.status(400).send('No such todo');
+    }
+    console.log('coming here', doc);
+    if(doc.completed == true) {
+      return res.status(400).send('Already completed');
+    }
+  }).catch((err) => {
+      return res.status(400).send('some error');
+  });
+
   update.completed = req.body.completed;
   update.completedAt = new Date().getTime();
 
