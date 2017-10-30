@@ -1,3 +1,4 @@
+const _ = require('lodash');
 var express = require('express');
 var bodyParser = require('body-parser');
 var {ObjectID} = require('mongodb');
@@ -61,6 +62,62 @@ Todo.findByIdAndRemove(id).then((doc) => {
   res.status(400).send();
   });
 });
+
+app.patch('/todos/:id', (req,res) => {
+  var update = {
+    // text:'',
+    // completed:null,
+    // completedAt:null
+  }
+var id=req.params.id;
+console.log(req.body);
+
+// var body = _.pick(req.body, ['text', 'completed']);
+// if(!ObjectID.isValid(id)) {
+//   return res.status(404).send();
+// }
+// if(_.isBoolean(body.completed) && body.completed) {
+// body.completedAt = new Date().getTime();
+//
+// } else {
+// body.completed = false;
+// body.completedAt = null;
+// }
+
+if(!(req.body.completed || req.body.text)) {
+  return res.status(400).send('Please send a data');
+}
+
+if (req.body.completed) {
+  if(!(typeof(req.body.completed) == 'boolean')) {
+    return res.status(400).send('Invalid status value');
+  }
+}
+
+if(req.body.completed && req.body.completed == 'true') {
+  update.completed = req.body.completed;
+  update.completedAt = new Date().getTime();
+
+} else {
+  update.completed = false;
+  update.completedAt = null;
+}
+
+if(req.body.text) {
+  update.text = req.body.text;
+}
+
+Todo.findByIdAndUpdate(id,{$set: update}, {new: true}).then((todo) => {
+  if(!todo) {
+    return res.status(404).send();
+  }
+  res.send({todo})
+}).catch((e) => {
+  res.status(404).send();
+});
+
+});
+
 
 app.listen(port, () => {
   console.log(`Server up on ${port}`);
