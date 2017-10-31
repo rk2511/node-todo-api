@@ -5,7 +5,7 @@ var bodyParser = require('body-parser');
 var {ObjectID} = require('mongodb');
 var {mongoose} = require('./db/mongoose.js');
 var {Todo} = require('./models/todo.js');
-var {user} = require('./models/user.js');
+var {User} = require('./models/user.js');
 
 var app = express();
 const port = process.env.PORT;
@@ -134,6 +134,25 @@ Todo.findByIdAndUpdate(id,{$set: update}, {new: true}).then((todo) => {
 
 });
 
+app.post('/users', (req,res) => {
+  var email = req.body.email;
+  var password = req.body.password;
+  //var token = req.body.token;
+  var user = new User({
+    email: email,
+    password: password
+  });
+  user.save().then((user) => {
+    return user.generateAuthToken();
+  }).then((token) => {
+  //  res.header('x-auth', token).send({_id:user._id, email:user.email});
+    res.header('x-auth', token).send(user);
+  }).catch((err) => {
+    console.log('is it coming here');
+    res.status(400).send(err);
+  });
+
+});
 
 app.listen(port, () => {
   console.log(`Server up on ${port}`);
