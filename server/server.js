@@ -149,7 +149,6 @@ app.post('/users', (req,res) => {
   //  res.header('x-auth', token).send({_id:user._id, email:user.email});
     res.header('x-auth', token).send(user);
   }).catch((err) => {
-    console.log('is it coming here');
     res.status(400).send(err);
   });
 
