@@ -8,12 +8,14 @@ var userThreeId = new ObjectID();
 
 var todos = [{
   _id: new ObjectID(),
-  text: 'This is dummy 1'
+  text: 'This is dummy 1',
+  userid:userOneId
 }, {
   _id: new ObjectID(),
   text: 'This is dummy 2',
   completed:true,
-  completedAt:1111
+  completedAt:1111,
+  userid: userTwoId
 }];
 
 var users = [{
@@ -27,7 +29,11 @@ var users = [{
 }, {
   _id: userTwoId,
   email: 'abcd@efgh.com',
-  password: 'abcde123456'
+  password: 'abcde123456',
+  tokens: [{
+    access: 'auth',
+    token: jwt.sign({_id:userTwoId, access: 'auth'}, 'abc123').toString()
+  }]
 },
 {
   _id: userThreeId,
