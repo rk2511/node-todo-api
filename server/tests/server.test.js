@@ -3,21 +3,9 @@ const request = require('supertest');
 var {app} = require('./../server.js');
 var {Todo} = require('./../models/todo.js');
 const {ObjectID} = require('mongodb');
-var todos = [{
-  _id: new ObjectID(),
-  text: 'This is dummy 1'
-}, {
-  _id: new ObjectID(),
-  text: 'This is dummy 2',
-  completed:true,
-  completedAt:1111
-}];
-
-beforeEach ((done) => {
-  Todo.remove({}).then(() => {
-    return Todo.insertMany(todos);
-  }).then(() => done());
-});
+const {todos,populateTodos,users,populateUsers} = require('./seed/seed.js')
+beforeEach (populateUsers);
+beforeEach (populateTodos);
 
 describe('POST api test', () => {
   it('should test create todo', (done) => {
@@ -155,5 +143,69 @@ it('Should return 404 when invalid', (done) => {
 });
 
 describe('Patch update a todo' , () => {
-  it('')
+
+});
+
+describe('GET users/me', () => {
+
+it('should authenitcate the user',  (done) => {
+  request(app)
+  .get('/users/me')
+  .set('x-auth', users[0].tokens[0].token)
+  .expect(200)
+  .expect((res) => {
+    expect(res.body._id).toBe(users[0]._id.toHexString());
+    expect(res.body.email).toBe(users[0].email);
+  })
+  .end(done);
+});
+
+it('should return 401 for unauth user', (done) => {
+  request(app)
+  .get('/users/me')
+  .set('x-auth', 'abcdef123')
+  .expect(401)
+  .expect((res) => {
+    expect(res.body).toEqual({});
+  })
+  .end(done);
+});
+});
+
+describe('POST users signup', () => {
+
+  it('should signup the user', (done) => {
+    var email = 'test@123.com';
+    var password = '123abcd';
+    request(app)
+    .post('/users')
+    .send({email,password})
+    .expect(200)
+    .expect((res) => {
+      expect(res.headers['x-auth']).toExist();
+      expect(res.body._id).toExist();
+      expect(res.body.email).toBe(email);
+    })
+    .end(done);
+  });
+
+  it('should not signup if validation error', (done) => {
+    var email = 'abc@abc.def';
+    var password = '1234';
+    request(app)
+    .post('/users')
+    .send({email,password})
+    .expect(400)
+    .end(done);
+  });
+
+  it('should not signup if already signedup', (done) => {
+    var email = 'abc@def.com';
+    var password = '12345335';
+    request(app)
+    .post('/users')
+    .send({email,password})
+    .expect(400)
+    .end(done);
+  });
 });
